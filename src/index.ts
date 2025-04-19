@@ -13,8 +13,8 @@ async function main() {
             console.log(`Fetching orderbook for ${input.symbol} (${input.category})`)
             const orderbook = await getOrderbook(input.category, input.symbol)
 
-            const asks = getLimitedOrderbook(input.numberOfNear.toNumber(), orderbook.asks, false)
-            const bids = getLimitedOrderbook(input.numberOfNear.toNumber(), orderbook.bids, true)
+            const asks = getLimitedOrderbook(input.numberOfNear.toNumber(), orderbook.asks)
+            const bids = getLimitedOrderbook(input.numberOfNear.toNumber(), orderbook.bids)
 
             const asksFirstValidation = isFirstValidationFailed(input.numberOfNear, input.numberOfFar, orderbook.asks.length)
             const bidsFirstValidation = isFirstValidationFailed(input.numberOfNear, input.numberOfFar, orderbook.bids.length)
@@ -127,7 +127,7 @@ async function getOrderbook(category: Category, symbol: string) {
     }
 }
 
-function getLimitedOrderbook(limit: number, orderbook: Orderbook, isBid: boolean) {
+function getLimitedOrderbook(limit: number, orderbook: Orderbook) {
     if (limit < 0 || !orderbook || orderbook.length === 0) {
         return [];
     }
@@ -136,9 +136,7 @@ function getLimitedOrderbook(limit: number, orderbook: Orderbook, isBid: boolean
         return [];
     }
 
-    const normalizedOrderbook = isBid ? [...orderbook].reverse() : orderbook;
-
-    return normalizedOrderbook.slice(limit);
+    return orderbook.slice(limit);
 }
 
 function getCumulativeVolume(orderbook: Orderbook) {
@@ -180,7 +178,7 @@ function getRangeFar(eachOrderAverage: string, devideBy: number) {
 }
 
 function isFirstValidationFailed(numberOfNear: Decimal, numberOfFar: Decimal, ordersLength: number) {
-    if(numberOfNear.add(numberOfFar).gte(ordersLength)) {
+    if(numberOfNear.add(numberOfFar).gt(ordersLength)) {
         return true
     }
 
