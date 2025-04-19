@@ -17,6 +17,7 @@ model inputs {
   percentageOfNear Decimal  @db.Decimal(36, 18)
   devidedUpRatio   Decimal  @db.Decimal(36, 18)
   devidedDownRatio Decimal  @db.Decimal(36, 18)
+  faceValue        Decimal  @db.Decimal(36, 18)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
@@ -35,6 +36,7 @@ model outputs {
   eachOrderAverage    Decimal  @db.Decimal(36, 18)
   farDownRange        Decimal  @db.Decimal(36, 18)
   farUpRange          Decimal  @db.Decimal(36, 18)
+  firstBidPrice       Decimal  @db.Decimal(36, 18)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }

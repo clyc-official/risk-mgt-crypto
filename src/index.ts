@@ -46,8 +46,8 @@ async function main() {
 
             const farOrderTotalVolume = getFarOrderTotalVolume(volumeAvg, priceChangePercentAvg, input.percenatageOfFar.toNumber(), input.percentageOfNear.toNumber())
             const eachOrderAverage = getEachOrderAverage(farOrderTotalVolume, input.numberOfFar.toNumber())
-            const farDownRange = getRangeFar(eachOrderAverage, input.devidedDownRatio.toNumber())
-            const farUpRange = getRangeFar(eachOrderAverage, input.devidedUpRatio.toNumber())            
+            const farDownRange = getRangeFar(eachOrderAverage, input.devidedDownRatio.toNumber(), input.faceValue.toNumber())
+            const farUpRange = getRangeFar(eachOrderAverage, input.devidedUpRatio.toNumber(), input.faceValue.toNumber())            
 
             console.log(`Saving orderbook for ${input.symbol} (${input.category})`)
             await saveOutput(db, {
@@ -62,7 +62,8 @@ async function main() {
                 farOrderTotalVolume: farOrderTotalVolume,
                 farUpRange: farUpRange,
                 numberOfFar: input.numberOfFar.toNumber(),
-                numberOfNear: input.numberOfNear.toNumber()
+                numberOfNear: input.numberOfNear.toNumber(),
+                firstBidPrice: orderbook.bids[0][0]
             })
         }
 
@@ -90,7 +91,8 @@ async function getInputs(db: PrismaClient) {
             percenatageOfFar: true,
             percentageOfNear: true,
             devidedDownRatio: true,
-            devidedUpRatio: true
+            devidedUpRatio: true,
+            faceValue: true
         }
     })
 }
@@ -173,8 +175,8 @@ function getEachOrderAverage(farOrderTotalVolume: string, numberOfFar: number) {
     return (parseFloat(farOrderTotalVolume)/numberOfFar).toString()
 }
 
-function getRangeFar(eachOrderAverage: string, devideBy: number) {
-    return (parseFloat(eachOrderAverage) * devideBy).toString()
+function getRangeFar(eachOrderAverage: string, devideBy: number, faceValue: number) {
+    return (parseFloat(eachOrderAverage) * devideBy / faceValue).toString()
 }
 
 function isFirstValidationFailed(numberOfNear: Decimal, numberOfFar: Decimal, ordersLength: number) {
@@ -205,7 +207,8 @@ async function saveOutput(db: PrismaClient, data: {
     eachOrderAverage: string
     farDownRange: string,
     farUpRange: string,
-    farOrderTotalVolume: string
+    farOrderTotalVolume: string,
+    firstBidPrice: string
 }) {
     const found = await db.outputs.findFirst({
         where: {
@@ -231,6 +234,7 @@ async function saveOutput(db: PrismaClient, data: {
                 farDownRange: data.farDownRange,
                 farUpRange: data.farUpRange,
                 farOrderTotalVolume: data.farOrderTotalVolume,
+                firstBidPrice: data.firstBidPrice
             }
         })
     } else {
@@ -248,6 +252,7 @@ async function saveOutput(db: PrismaClient, data: {
                 farDownRange: data.farDownRange,
                 farUpRange: data.farUpRange,
                 farOrderTotalVolume: data.farOrderTotalVolume,
+                firstBidPrice: data.firstBidPrice
             }
         })
     }
