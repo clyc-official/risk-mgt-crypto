@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model inputs {
+  id               Int      @id @default(autoincrement())
+  symbol           String
+  category         Category
+  numberOfNear     Decimal  @db.Decimal(36, 18)
+  numberOfFar      Decimal  @db.Decimal(36, 18)
+  percenatageOfFar Decimal  @db.Decimal(36, 18)
+  percentageOfNear Decimal  @db.Decimal(36, 18)
+  devidedUpRatio   Decimal  @db.Decimal(36, 18)
+  devidedDownRatio Decimal  @db.Decimal(36, 18)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model outputs {
+  id                  Int      @id @default(autoincrement())
+  symbol              String
+  category            Category
+  numberOfNear        Decimal  @db.Decimal(36, 18)
+  numberOfFar         Decimal  @db.Decimal(36, 18)
+  percenatageOfFar    Decimal  @db.Decimal(36, 18)
+  percentageOfNear    Decimal  @db.Decimal(36, 18)
+  devidedUpRatio      Decimal  @db.Decimal(36, 18)
+  devidedDownRatio    Decimal  @db.Decimal(36, 18)
+  farOrderTotalVolume Decimal  @db.Decimal(36, 18)
+  eachOrderAverage    Decimal  @db.Decimal(36, 18)
+  farDownRange        Decimal  @db.Decimal(36, 18)
+  farUpRange          Decimal  @db.Decimal(36, 18)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+enum Category {
+  Spot
+  Futures
+}
