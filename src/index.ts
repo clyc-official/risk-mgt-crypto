@@ -13,6 +13,11 @@ async function main() {
             console.log(`Fetching orderbook for ${input.symbol} (${input.category})`)
             const orderbook = await getOrderbook(input.category, input.symbol)
 
+            if(!orderbook) {
+                console.log("Cant find symbol")
+                continue
+            }
+
             const asks = getLimitedOrderbook(input.numberOfNear.toNumber(), orderbook.asks)
             const bids = getLimitedOrderbook(input.numberOfNear.toNumber(), orderbook.bids)
 
@@ -20,20 +25,22 @@ async function main() {
             const bidsFirstValidation = isFirstValidationFailed(input.numberOfNear, input.numberOfFar, orderbook.bids.length)
 
             if(asksFirstValidation) {
-                throw new Error("First validation failed due to numberOfNear + numberOfFar > asksLength")
+                console.log("First validation failed due to numberOfNear + numberOfFar > asksLength")
+                continue
             }
             if(bidsFirstValidation) {
-                throw new Error("First validation failed due to numberOfNear + numberOfFar > bidsLength")
+                console.log("First validation failed due to numberOfNear + numberOfFar > bidsLength")
+                continue
             }
 
             const asksSecondValidation = isSecondValidationFailed(input.numberOfNear, orderbook.asks.length)
             const bidsSecondValidation = isSecondValidationFailed(input.numberOfNear, orderbook.bids.length)
 
             if(asksSecondValidation) {
-                throw new Error("Second validation failed due to numberOfNear < asksLength")
+                console.log("Second validation failed due to numberOfNear < asksLength")
             }
             if(bidsSecondValidation) {
-                throw new Error("Second validation failed due to numberOfNear < bidsLength")
+                console.log("Second validation failed due to numberOfNear < bidsLength")
             }
 
             const asksCumVolume = getCumulativeVolume(asks)
@@ -125,7 +132,7 @@ async function getOrderbook(category: Category, symbol: string) {
             bids: data.result.b
         }
     } catch(err) {
-        throw new Error(`Can't get orderbook for '${symbol}'`)
+        return null
     }
 }
 
